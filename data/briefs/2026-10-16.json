@@ -1,0 +1,48 @@
+{
+  "theme": "Reliable agentic applications combine efficient tool selection, trace-aware evaluation, and persistent memory.",
+  "articles": [
+    {
+      "title": "TRACER: Trajectory-Aware Tool Retrieval for LLM Agents",
+      "source": "arXiv",
+      "published_date": "2026-10-15",
+      "url": "https://arxiv.org/abs/2610.21267",
+      "summary": "TRACER retrieves a small, contextually relevant subset of tools instead of exposing an agent to an entire registry. It indexes prior tool-call sequences in a trie and combines empirical usage patterns with conversation-aware retrieval. Across six environments, it improved tool-selection accuracy in 21 of 24 model-environment pairs while substantially reducing prompt-token usage.",
+      "key_takeaways": [
+        "Large tool registries can hurt both cost and tool selection.",
+        "Prior execution trajectories can guide dynamic tool retrieval.",
+        "Always design fallbacks for unseen tool-call sequences and cold-start deployments."
+      ],
+      "why_it_matters": "This is directly relevant to your beginner-level agent-building goals and to AI tools for students or small businesses, where controlling tool count, latency, and API cost matters.",
+      "reading_minutes": 7
+    },
+    {
+      "title": "Four evaluation engineering lessons learned from building agent plugins",
+      "source": "Google Cloud Blog",
+      "published_date": "2026-10-16",
+      "url": "https://cloud.google.com/blog/topics/developers-practitioners/four-eval-engineering-lessons",
+      "summary": "This article argues that agent evaluation must inspect execution traces rather than only final answers. Using a Google Cloud developer plugin as a case study, it explains how tool-call logs, repeatable test suites, and workflow-specific rubrics reveal whether an agent actually performed required actions. The lessons provide a practical foundation for evaluating tool use and agent reliability.",
+      "key_takeaways": [
+        "Grade tool-call trajectories, not only summaries.",
+        "Use repeatable, workflow-specific evaluation suites.",
+        "Treat evaluation engineering as a core development discipline."
+      ],
+      "why_it_matters": "For a Summer 2027 AI/ML or AI-product internship, this offers a practical portfolio pattern: build an agent, log its actions, define rubrics, and demonstrate reliability improvements.",
+      "reading_minutes": 6
+    },
+    {
+      "title": "How to implement long-term AI agent memory in AlloyDB and Memorystore for Valkey",
+      "source": "Google Cloud Blog",
+      "published_date": "2026-10-02",
+      "url": "https://cloud.google.com/blog/products/databases/implementing-long-term-ai-agent-memory-in-alloydb-and-memorystore/",
+      "summary": "This post presents a two-tier memory architecture for long-running agents: fast short-term state in Memorystore for Valkey and durable semantic memory in AlloyDB AI. It explains how agents can retain user preferences and workflow context across sessions while controlling latency, token usage, and access boundaries. The design connects agent memory to practical database and cloud architecture choices.",
+      "key_takeaways": [
+        "Separate short-lived conversational state from durable user memory.",
+        "Use database-backed memory for multi-session workflows rather than endlessly expanding prompts.",
+        "Treat persistence, retrieval, and access controls as architectural concerns."
+      ],
+      "why_it_matters": "This strengthens your beginner cloud and system-design skills and maps well to useful products for students or small businesses, such as personalized study, scheduling, or customer-support agents.",
+      "reading_minutes": 7
+    }
+  ],
+  "suggested_order": "Read TRACER first for efficient tool use, then the evaluation article for reliability, and finish with the memory architecture piece for cloud system design. Total: 20 minutes."
+}

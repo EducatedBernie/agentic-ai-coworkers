@@ -7,7 +7,7 @@ profile.json, past ratings, and weak topics from the career coach.
 """
 
 import json
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 from agents import Agent, Runner, WebSearchTool
 from agents.tool import WebSearchToolFilters
@@ -95,6 +95,37 @@ def make_agent(profile: dict) -> Agent:
     )
 
 
+MAX_ATTEMPTS = 3
+DATE_FORMATS = ("%Y-%m-%d", "%B %d, %Y", "%b %d, %Y", "%b. %d, %Y", "%d %B %Y", "%d %b %Y")
+
+
+def parse_date(text: str) -> date | None:
+    for fmt in DATE_FORMATS:
+        try:
+            return datetime.strptime(text.strip(), fmt).date()
+        except ValueError:
+            continue
+    return None
+
+
+def validate(brief: DailyBrief, since: date, today: date, seen: set[str]) -> list[str]:
+    """Return problems with the brief; normalizes valid dates to YYYY-MM-DD in place."""
+    problems = []
+    if len(brief.articles) != 3:
+        problems.append(f"returned {len(brief.articles)} articles, need exactly 3")
+    for a in brief.articles:
+        d = parse_date(a.published_date)
+        if d is None:
+            problems.append(f"{a.url}: unreadable date '{a.published_date}'")
+        elif not since <= d <= today:
+            problems.append(f"{a.url}: published {d}, outside {since} to {today}")
+        else:
+            a.published_date = d.isoformat()
+        if a.url in seen:
+            problems.append(f"{a.url}: already recommended before")
+    return problems
+
+
 def to_markdown(brief: DailyBrief, today: date) -> str:
     total = sum(a.reading_minutes for a in brief.articles)
     out = [f"# Daily Tech Brief: {today.isoformat()}", "",
@@ -115,15 +146,28 @@ def main() -> None:
     profile = load_profile()
     today = date.today()
 
-    result = Runner.run_sync(make_agent(profile), build_prompt(profile, today))
-    brief: DailyBrief = result.final_output
+    since = today - timedelta(days=profile["daily_brief"]["lookback_days"])
+    seen = set(load_json(SEEN_URLS, []))
+    agent = make_agent(profile)
 
-    if len(brief.articles) != 3:
-        print(f"Warning: agent returned {len(brief.articles)} articles instead of 3.")
+    # The model doesn't always respect the date window or format, so check in code
+    # and send it back to replace any article that fails.
+    run_input = build_prompt(profile, today)
+    for attempt in range(1, MAX_ATTEMPTS + 1):
+        result = Runner.run_sync(agent, run_input)
+        brief: DailyBrief = result.final_output
+        problems = validate(brief, since, today, seen)
+        if not problems:
+            break
+        print(f"Attempt {attempt}: {len(problems)} problem(s): " + "; ".join(problems))
+        run_input = result.to_input_list() + [{"role": "user", "content":
+            "Some articles failed validation:\n- " + "\n- ".join(problems) +
+            "\nReplace those articles with different ones that pass, and return the full brief again."}]
+    else:
+        print("Warning: saving brief with unresolved problems; evaluate.py will flag them.")
 
     save_json(BRIEFS_DIR / f"{today.isoformat()}.json", brief.model_dump())
-    seen = load_json(SEEN_URLS, [])
-    save_json(SEEN_URLS, seen + [a.url for a in brief.articles if a.url not in seen])
+    save_json(SEEN_URLS, load_json(SEEN_URLS, []) + [a.url for a in brief.articles if a.url not in seen])
 
     md = to_markdown(brief, today)
     path = OUTPUT / "briefs" / f"{today.isoformat()}.md"

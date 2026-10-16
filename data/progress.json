@@ -1,0 +1,30 @@
+[
+  {
+    "date": "2026-10-16",
+    "topic": "recommender systems",
+    "question": "Design a DoorDash home-screen recommendation system that ranks restaurants for a user, covering objective, candidate generation, ranking features/model, cold start, offline/online evaluation, and production trade-offs.",
+    "score": 3,
+    "feedback": "You gave a coherent two-stage design with sensible features, cold-start fallback, ranking metrics, A/B testing, and caching. To reach interview-ready level, address business objectives beyond clicks, multi-stage retrieval, exposure/selection bias, time-varying availability, calibration/fairness, guardrails, and concrete latency/reliability targets."
+  },
+  {
+    "date": "2026-10-16",
+    "topic": "rag",
+    "question": "Design a RAG system for a customer-facing support assistant using policies, delivery records, and company documentation, covering ingestion, retrieval/reranking, hallucination prevention, evaluation, latency, privacy, and failure handling.",
+    "score": 3,
+    "feedback": "You covered chunking, embeddings, vector retrieval, prompt grounding, abstention, human evaluation, and privacy basics. You missed metadata filtering, hybrid retrieval, reranking, citation/claim verification, automated metrics and retrieval recall, access control for records, prompt-injection defenses, freshness, and operational fallbacks."
+  },
+  {
+    "date": "2026-10-16",
+    "topic": "system design",
+    "question": "Design an AI-powered restaurant recommender combining recommendation models and RAG for: 'Find vegetarian Thai restaurants under $30 that can deliver within 30 minutes, and explain why you recommend them.' Cover request flow, structured constraints, retrieval/ranking, structured data vs RAG, tools, grounding, evaluation, and latency.",
+    "score": 4,
+    "feedback": "Strong integrated design: you separated dynamic structured constraints from RAG, reused ranking, added hybrid retrieval/reranking, evidence-based explanations, validation, graceful relaxation, parallelism, caching, and relevant metrics. To reach 5/5, discuss ambiguity and authorization, price/ETA definitions, failure/timeouts, observability, prompt-injection defenses, and whether an LLM is necessary for extraction."
+  },
+  {
+    "date": "2026-10-16",
+    "topic": "python",
+    "question": "Implement top_k_recommendations(scores, k) returning highest-scoring restaurant IDs, breaking ties alphabetically, without mutation; explain complexity.",
+    "score": 4,
+    "feedback": "Correct implementation, validation, tie-breaking, non-mutation, and complexity reasoning. Minor omission: explicitly noting k=0 behavior and that the stated O(n log k) bound assumes the heap path, while k>=n becomes O(n log n); the code itself is interview-ready."
+  }
+]

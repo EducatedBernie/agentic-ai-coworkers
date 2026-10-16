@@ -19,7 +19,8 @@ from common import (DATA, MODEL, OUTPUT, PROGRESS, load_json, load_profile,
 
 @function_tool
 def record_assessment(topic: str, question: str, score: int, feedback: str) -> str:
-    """Save the score for one answer the user gave.
+    """Save the score for one answer the user gave. Only call this after the user has
+    actually answered the question; never record a placeholder or baseline score.
 
     Args:
         topic: Short skill area, lowercase, reused consistently (e.g. "system design", "python", "rag").
@@ -79,7 +80,8 @@ What you do:
 2. Interview drills: ask ONE question at a time (conceptual, coding, system design, or
    behavioral scenario), tuned to the target roles and to job descriptions you have found.
    Wait for the answer. Then evaluate it honestly: what was right, what was missing, a better
-   answer, and a follow-up question that pushes deeper. Call record_assessment for every answer.
+   answer, and a follow-up question that pushes deeper. Call record_assessment once per answer,
+   only after the learner has answered (never when you are just asking the question).
 3. Gaps and plans: call get_progress before giving any assessment of strengths or weaknesses.
    Recommend specific resources (docs, courses, papers, projects) and a concrete weekly plan.
 

@@ -118,6 +118,8 @@ To make Agent 1 actually daily, schedule it (macOS/Linux cron, 8am):
 | Novelty | URL never recommended before | Daily learning should be new |
 | Format compliance | Exactly 3 articles per brief | Spec requirement |
 
+Agent 1 also checks itself before saving. It parses each article's date and rejects anything that is unreadable, outside the window, or already recommended. It then asks the model for replacements, up to 3 attempts. In the first real run, this caught a March 2026 article and replaced it.
+
 **Agent 1: effectiveness (human)**: I rate each article 1-5 for usefulness. The average rating should rise over time as ratings feed back into recommendations.
 
 **Agent 2: user progress**: every answer is scored 1-5 by topic. The evaluation shows each topic's first and latest score and compares the average of earlier answers to later ones. Rising scores on topics that were previously weak show the coaching is working.
