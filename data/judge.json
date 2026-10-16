@@ -1,0 +1,25 @@
+{
+  "2026-10-16": [
+    {
+      "url": "https://arxiv.org/abs/2610.21267",
+      "relevance": 5,
+      "depth": 4,
+      "actionability": 3,
+      "reason": "Highly aligned with agentic AI, tool use, and retrieval, with substantial empirical evaluation across models and environments; however, it is research-oriented and likely difficult for a beginner to apply immediately."
+    },
+    {
+      "url": "https://cloud.google.com/blog/topics/developers-practitioners/four-eval-engineering-lessons",
+      "relevance": 5,
+      "depth": 4,
+      "actionability": 5,
+      "reason": "Exceptionally relevant to LLM evaluation and reliable tool-using agents, presenting concrete practices\u2014trajectory grading, asynchronous telemetry, live versus dry runs, and golden sets\u2014that the learner can implement in projects now."
+    },
+    {
+      "url": "https://cloud.google.com/blog/products/databases/implementing-long-term-ai-agent-memory-in-alloydb-and-memorystore/",
+      "relevance": 5,
+      "depth": 4,
+      "actionability": 4,
+      "reason": "Strong fit for agent memory, RAG, hybrid retrieval, and cloud architecture, with SQL/Python patterns and a complete design, though its Google-specific enterprise stack and product framing make it less immediately transferable for a beginner."
+    }
+  ]
+}

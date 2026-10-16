@@ -1,5 +1,7 @@
 # Agentic AI Coworkers
 
+**Submission write-up:** [docs/Submission.pdf](docs/Submission.pdf) ([source](docs/SUBMISSION.md))
+
 Two personal AI agents built with the [OpenAI Agents SDK](https://openai.github.io/openai-agents-python/):
 
 | Agent | File | What it produces |
@@ -23,48 +25,39 @@ Two personal AI agents built with the [OpenAI Agents SDK](https://openai.github.
 
 ## 2. Architecture
 
+### Agent 1 architecture
+
 ```mermaid
 flowchart LR
-    P[profile.json<br/>interests, skills, goals]
+    P[profile.json<br/>interests, skills, goals] --> D1
+    SEEN[(seen_urls.json)] --> D1
+    RAT[(ratings.json)] --> D1
+    PROG[(progress.json<br/>from Agent 2)] -- weak topics --> D1
+    D1[Build personalized<br/>context] --> D2[LLM agent<br/>structured output]
+    D2 <--> WS[[Web search tool<br/>trusted domains only]]
+    D2 --> D3{Validate in code<br/>date window, repeats,<br/>exactly 3}
+    D3 -- fail: send problems,<br/>retry up to 3x --> D2
+    D3 -- pass --> OUT[Daily brief<br/>output/briefs/*.md]
+    D3 -- pass: record URLs --> SEEN2[(seen_urls.json)]
+    OUT --> EV[evaluate.py<br/>link, date, source checks<br/>+ LLM judge]
+```
 
-    subgraph A1[Agent 1: DailyTechUpgradeAgent]
-        D1[Build personalized prompt] --> D2[LLM agent]
-        D2 <--> WS1[Web search tool<br/>trusted domains only]
-        D2 --> D3[Structured DailyBrief<br/>3 articles]
-    end
+### Agent 2 architecture
 
-    subgraph A2[Agent 2: Career Coach]
-        C1[Chat loop] --> C2[LLM agent]
-        C2 <--> WS2[Web search tool<br/>jobs, research, programs]
-        C2 <--> T1[record_assessment]
-        C2 <--> T2[get_progress]
-        C2 --> C3[Readiness report]
-    end
-
-    subgraph M[Memory]
-        SEEN[(seen_urls.json)]
-        RAT[(ratings.json)]
-        PROG[(progress.json)]
-        SESS[(coach.db<br/>chat history)]
-    end
-
-    P --> D1
-    P --> C2
-    SEEN --> D1
-    RAT --> D1
-    PROG -- weak topics --> D1
-    D3 --> SEEN
-    D3 --> OUT1[output/briefs/*.md]
-    T1 --> PROG
-    T2 --> PROG
-    C1 <--> SESS
-    C3 --> OUT2[output/reports/*.md]
-
-    D3 --> BR[(data/briefs/*.json)]
-    BR --> EV[evaluate.py]
-    RAT --> EV
-    PROG --> EV
-    EV --> OUT3[output/evaluation.md]
+```mermaid
+flowchart TB
+    U((Learner)) <--> C1[Chat loop<br/>/report /progress /reset]
+    C1 <--> SESS[(coach.db<br/>chat memory)]
+    C1 <--> C2[LLM coach agent]
+    P[profile.json] --> C2
+    C2 <--> WS[[Web search tool<br/>jobs, research, resources]]
+    C2 -- after each answer --> T1[[record_assessment]]
+    C2 <--> T2[[get_progress]]
+    C2 --> R[Career Readiness Report<br/>output/reports/*.md]
+    T1 --> PROG[(progress.json<br/>scores by topic)]
+    PROG --> T2
+    PROG -- weak topics --> A1[Agent 1<br/>personalization]
+    PROG --> EV[evaluate.py<br/>score trends]
 ```
 
 **Tools**
@@ -91,6 +84,7 @@ Edit `profile.json` with your interests, skills, and target roles, then run:
 python daily_tech.py                         # today's brief -> output/briefs/YYYY-MM-DD.md
 python evaluate.py rate 2026-10-16 5 4 3     # rate the 3 articles (feeds personalization)
 python coach.py                              # chat; /report, /progress, /reset, /quit
+python evaluate.py judge                     # automated LLM-judge scores for new briefs
 python evaluate.py                           # -> output/evaluation.md
 ```
 

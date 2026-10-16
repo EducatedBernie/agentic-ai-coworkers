@@ -2,6 +2,7 @@
 
     python evaluate.py                        # write output/evaluation.md
     python evaluate.py rate 2026-10-16 5 4 3  # rate that day's 3 articles (1-5)
+    python evaluate.py judge                  # automated LLM-judge scores for unjudged briefs
 
 Agent 1 accuracy is checked automatically (does the URL load, is the date in the
 lookback window, is it from a trusted domain, is it a repeat). Usefulness comes
@@ -15,8 +16,11 @@ from datetime import date, timedelta
 from urllib.parse import urlparse
 
 import requests
+from agents import Agent, Runner, WebSearchTool
+from pydantic import BaseModel, Field
 
-from common import BRIEFS_DIR, OUTPUT, PROGRESS, RATINGS, load_json, load_profile, save_json
+from common import (BRIEFS_DIR, JUDGE, MODEL, OUTPUT, PROGRESS, RATINGS, load_json, load_profile,
+                    require_api_key, save_json)
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (DailyTechUpgradeAgent link checker)"}
 
@@ -90,6 +94,11 @@ def evaluate_briefs(profile: dict) -> list[str]:
     scores = [i["score"] for day in ratings.values() for i in day]
     if scores:
         out.append(f"| Your usefulness rating | {sum(scores) / len(scores):.1f}/5 over {len(scores)} articles |")
+    judged = [s for day in load_json(JUDGE, {}).values() for s in day]
+    if judged:
+        for key in ("relevance", "depth", "actionability"):
+            avg = sum(s[key] for s in judged) / len(judged)
+            out.append(f"| LLM-judge {key} (automated) | {avg:.1f}/5 over {len(judged)} articles |")
 
     problems = [r for r in rows if r["link"] == "broken" or not r["date_ok"] or not r["trusted"] or r["repeat"]]
     if problems:
@@ -144,7 +153,50 @@ def rate(day: str, scores: list[str]) -> None:
     print(f"Saved ratings for {day}. Future briefs will use them for personalization.")
 
 
+class ArticleScore(BaseModel):
+    url: str
+    relevance: int = Field(description="1-5: fit to the learner's interests, skill levels, and goals")
+    depth: int = Field(description="1-5: technical depth and quality of the article itself")
+    actionability: int = Field(description="1-5: how directly the learner can apply it in the next month")
+    reason: str = Field(description="One sentence justifying the scores")
+
+
+class JudgeResult(BaseModel):
+    scores: list[ArticleScore]
+
+
+JUDGE_INSTRUCTIONS = """You are a strict evaluator of a daily reading brief made by another AI agent.
+Open each article with web search, read it, and score it against the learner profile.
+Be critical: 5 means exceptional. Do not reward the brief's own summary; judge the actual article."""
+
+
+def judge() -> None:
+    """Score every brief that hasn't been judged yet with an independent LLM judge."""
+    require_api_key()
+    profile = load_profile()
+    agent = Agent(name="BriefJudge", instructions=JUDGE_INSTRUCTIONS,
+                  tools=[WebSearchTool()], output_type=JudgeResult, model=MODEL)
+    results = load_json(JUDGE, {})
+    for f in sorted(BRIEFS_DIR.glob("*.json")):
+        if f.stem in results:
+            continue
+        articles = load_json(f, {}).get("articles", [])
+        prompt = json.dumps({"learner": {k: profile[k] for k in ("interests", "skills", "career_goals")},
+                             "articles": [{"title": a["title"], "url": a["url"]} for a in articles]}, indent=2)
+        scores = Runner.run_sync(agent, prompt).final_output.scores
+        urls = {a["url"] for a in articles}
+        valid = [s.model_dump() for s in scores if s.url in urls
+                 and all(1 <= v <= 5 for v in (s.relevance, s.depth, s.actionability))]
+        if len(valid) != len(articles):
+            print(f"{f.stem}: judge returned {len(valid)} valid scores for {len(articles)} articles")
+        results[f.stem] = valid
+        save_json(JUDGE, results)
+        print(f"Judged {f.stem}: " + ", ".join(f"{s['relevance']}/{s['depth']}/{s['actionability']}" for s in valid))
+
+
 def main() -> None:
+    if len(sys.argv) >= 2 and sys.argv[1] == "judge":
+        return judge()
     if len(sys.argv) >= 2 and sys.argv[1] == "rate":
         if len(sys.argv) < 4:
             raise SystemExit("Usage: python evaluate.py rate YYYY-MM-DD s1 s2 s3")

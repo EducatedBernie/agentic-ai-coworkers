@@ -13,6 +13,7 @@ PROFILE = ROOT / "profile.json"
 
 SEEN_URLS = DATA / "seen_urls.json"      # Agent 1: URLs already recommended
 RATINGS = DATA / "ratings.json"          # Agent 1: your 1-5 usefulness ratings per brief
+JUDGE = DATA / "judge.json"              # Agent 1: automated LLM-judge scores per brief
 PROGRESS = DATA / "progress.json"        # Agent 2: scored interview answers
 BRIEFS_DIR = DATA / "briefs"             # Agent 1: raw structured briefs (used by the evaluator)
 

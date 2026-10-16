@@ -11,6 +11,9 @@ Briefs: 1, articles: 3
 | From trusted domain | 100% (3/3) |
 | No repeats across days | 100% (3/3) |
 | Exactly 3 articles per brief | 100% (1/1) |
+| LLM-judge relevance (automated) | 5.0/5 over 3 articles |
+| LLM-judge depth (automated) | 4.0/5 over 3 articles |
+| LLM-judge actionability (automated) | 4.0/5 over 3 articles |
 
 ## Agent 2: Career Coach
 
