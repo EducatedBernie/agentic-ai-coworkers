@@ -1,0 +1,46 @@
+{
+  "name": "Bernie",
+  "program": "MS Software Engineering, San Jose State University",
+  "interests": [
+    "agentic AI and multi-agent systems",
+    "LLM application engineering (RAG, tool use, evaluation)",
+    "recommender systems",
+    "data mining and machine learning",
+    "cloud and enterprise software architecture"
+  ],
+  "skills": {
+    "Python": "intermediate",
+    "SQL": "intermediate",
+    "machine learning fundamentals": "intermediate",
+    "LLM APIs and agents": "beginner",
+    "system design": "beginner",
+    "cloud (AWS/GCP/Azure)": "beginner"
+  },
+  "career_goals": {
+    "target_roles": ["AI/ML engineer intern", "software engineer intern (AI products)"],
+    "locations": ["San Francisco Bay Area", "remote"],
+    "timeline": "Summer 2027 internship",
+    "entrepreneurial_interest": "AI tools for students and small businesses"
+  },
+  "daily_brief": {
+    "lookback_days": 14,
+    "reading_minutes": 20,
+    "trusted_domains": [
+      "openai.com",
+      "anthropic.com",
+      "microsoft.com",
+      "blog.google",
+      "research.google",
+      "developers.googleblog.com",
+      "cloud.google.com",
+      "aws.amazon.com",
+      "ibm.com",
+      "langchain.com",
+      "blog.langchain.dev",
+      "ieee.org",
+      "acm.org",
+      "huggingface.co",
+      "arxiv.org"
+    ]
+  }
+}
